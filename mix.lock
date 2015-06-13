@@ -1,0 +1,5 @@
+%{"cowboy": {:hex, :cowboy, "1.0.0"},
+  "cowlib": {:hex, :cowlib, "1.0.1"},
+  "poison": {:hex, :poison, "1.4.0"},
+  "ranch": {:hex, :ranch, "1.0.0"},
+  "sync": {:git, "git://github.com/rustyio/sync", "ae7dbd4e6e2c08d77d96fc4c2bc2b6a3b266492b", [tag: "master"]}}

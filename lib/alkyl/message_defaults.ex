@@ -1,4 +1,4 @@
-defmodule MessageDefaults do
+defmodule Alkyl.MessageDefaults do
   def client_vars do
     %{
             "abiwordAvailable" => "no",

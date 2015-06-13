@@ -16,7 +16,7 @@ defmodule Alkyl.Mixfile do
   def application do
     [
         mod: { Alkyl, [] },
-        applications: [:cowboy, :ranch, :logger]
+        applications: [:cowboy, :ranch, :logger, :fs]
     ]
   end
 
@@ -32,7 +32,8 @@ defmodule Alkyl.Mixfile do
   defp deps do
     [
         { :cowboy,        "~> 1.0" },
-        { :poison,        "~> 1.3" }
+        { :poison,        "~> 1.3" },
+        { :fs,            "~> 0.9" }
     ]
   end
 end

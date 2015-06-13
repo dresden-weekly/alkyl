@@ -1,4 +1,4 @@
-defmodule WebsocketHandler do
+defmodule Alkyl.WebsocketHandler do
   # based on (and with comments from) https://github.com/IdahoEv/cowboy-elixir-example
   require Logger
 
@@ -81,7 +81,7 @@ defmodule WebsocketHandler do
 
     [ "message",  message ] = Poison.decode!(meaning)
 
-    e_reply = MessageProcessor.process message
+    e_reply = Alkyl.MessageProcessor.process message
 
     reply = "42" <> Poison.encode!([ "message",  e_reply ])
 

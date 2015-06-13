@@ -1,7 +1,4 @@
-
-# A cowboy handler for serving a single dynamic wepbage. No templates are used; the
-# HTML is all generated within the handler.
-defmodule DynamicPageHandler do
+defmodule Alkyl.DynamicPageHandler do
 
   # We are using the plain HTTP handler.  See the documentation here:
   #     http://ninenines.eu/docs/en/cowboy/HEAD/manual/cowboy_http_handler/

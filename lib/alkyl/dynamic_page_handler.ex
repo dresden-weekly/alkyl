@@ -32,6 +32,8 @@ defmodule Alkyl.DynamicPageHandler do
       # headers
       [ {"content-type", "text/html"} ],
 
+      # TODO: set session cookie express_sid / to something like s%3APm7Q814C4DOiukwE-N-jyYFWYdeCSui4.h26Md53eQcj4g4Dw79HJIoKJg2hWHB%2BJHDociuogrJ8
+
       # body of reply.
       build_body(request),
 
@@ -46,21 +48,14 @@ defmodule Alkyl.DynamicPageHandler do
 
   # Termination handler.  Usually you don't do much with this.  If things are breaking,
   # try uncommenting the output lines here to get some more info on what's happening.
-  def terminate(reason, request, state) do
-    #IO.puts("Terminating for reason: #{inspect(reason)}")
-    #IO.puts("Terminating after request: #{inspect(request)}")
-    #IO.puts("Terminating with state: #{inspect(state)}")
+  def terminate(_reason, _request, _state) do
+    #IO.puts("Terminating for reason: #{inspect(_reason)}")
+    #IO.puts("Terminating after request: #{inspect(_request)}")
+    #IO.puts("Terminating with state: #{inspect(_state)}")
     :ok
   end
 
-
-  def build_body(request) do
+  def build_body(_request) do
     File.read! "priv/pad.html"
   end
-
-  def dl_headers(request) do
-    {headers, req2 } = :cowboy_req.headers(request)
-    Enum.map(headers, fn item -> "<dt>#{elem(item, 0)}</dt><dd>#{elem(item, 1)}</dd>" end)
-  end
-
 end

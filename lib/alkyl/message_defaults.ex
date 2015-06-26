@@ -24,7 +24,7 @@ defmodule Alkyl.MessageDefaults do
                                       "clientIp" => "127.0.0.1",
                                       "historicalAuthorData" => %{},
                                       "initialAttributedText" => %{
-                                                                         "attribs" => "|8+13",
+                                                                         "attribs" => "|2+13",
                                                                          "text" => "This is an initial static text-piece.\n\n"},
                                       "padId" => "icke",
                                       "rev" => 0,

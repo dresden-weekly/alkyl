@@ -3,3 +3,6 @@
 erl_crash.dump
 *.ez
 *.beam
+config/dev.exs
+config/test.exs
+config/prod.exs

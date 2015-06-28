@@ -42,7 +42,7 @@ defmodule Alkyl.Utils.Common do
     num
   end
 
-  def contains_lf?("\n" <> string) do
+  def contains_lf?("\n" <> _) do
     true
   end
   def contains_lf?(<<_>> <> string) do
@@ -52,64 +52,49 @@ defmodule Alkyl.Utils.Common do
     false
   end
 
-  # defp split_lf_aware(str, 0, "", line), do: [ line, to_string(str) ]
-  # defp split_lf_aware(str, 0, acc, line), do: [ acc, line <> to_string(str) ]
-  # defp split_lf_aware([], _, acc, line), do: [ acc + line, "" ]
-
-  # defp split_lf_aware(["\n" | str], pos, acc, line) do
-  #   split_lf_aware(str, pos-1, acc <> line <> "\n", "")
+  def split_lf_aware(str, pos) do
+    split_lf_aware(str, pos, "", "")
+  end
+  defp split_lf_aware(str, 0, "", line), do: { line, str }
+  defp split_lf_aware(str, 0, acc, line), do: { acc, line <> str }
+  defp split_lf_aware("", _, "", line), do: { line, "" }
+  defp split_lf_aware("", _, acc, line), do: { acc, line }
+  # defp split_lf_aware("", _, acc, line) do
+  #   raise(ArgumentError, message: "position out of range")
   # end
-
-  # defp split_lf_aware([chr | str], pos, acc, line) do
-  #   split_lf_aware(str, pos-1, acc, line <> chr)
-  # end
-
-  # def split_lf_aware(str, pos) do
-  #   split_lf_aware(String.codepoints(str), pos, "", "")
-  # end
-
-  defp split_lf_aware(str, 0, "", line), do: { line, to_string(str) }
-  defp split_lf_aware(str, 0, acc, line), do: { acc, line <> to_string(str) }
-  defp split_lf_aware("", _, acc, line), do: { acc + line, "" }
-
   defp split_lf_aware("\n" <> str, pos, acc, line) do
     split_lf_aware(str, pos-1, acc <> line <> "\n", "")
   end
-
   defp split_lf_aware(<<chr :: utf8>> <> str, pos, acc, line) do
     split_lf_aware(str, pos-1, acc, line <> <<chr :: utf8>>)
-  end
-
-  def split_lf_aware(str, pos) do
-    split_lf_aware(str, pos, "", "")
   end
 
   def last_lf(string) do
     last_lf(string, 0, -1)
   end
-  defp last_lf("\n" <> string, num, last) do
+  defp last_lf("\n" <> string, num, _) do
     last_lf(string, num + 1, num)
   end
   defp last_lf(<<_>> <> string, num, last) do
     last_lf(string, num + 1, last)
   end
-  defp last_lf("", num, last) do
+  defp last_lf("", _, last) do
     last
   end
 
   def last_lf_before(string, max) do
-    last_lf_before(string, 0, max, 0, string)
+    last_lf_before(string, 1, max, 0)
   end
-  defp last_lf_before("\n" <> string, num, max, last, full) do
-    last_lf_before(string, num + 1, max, num, full)
+  defp last_lf_before("\n" <> string, num, max, _) do
+    last_lf_before(string, num + 1, max, num)
   end
-  defp last_lf_before(<<_>> <> string, num, max, last, full) when num <= max do
-    last_lf_before(string, num + 1, max, last, full)
+  defp last_lf_before(<<_::utf8>> <> string, num, max, last) when num <= max do
+    last_lf_before(string, num + 1, max, last)
   end
-  defp last_lf_before(<<_>> <> string, num, max, last, full) do
+  defp last_lf_before(<<_::utf8>> <> string, num, max, last) do
     last
   end
-  defp last_lf_before("", num, max, last, full) do
+  defp last_lf_before("", num, max, last) do
     last
   end
 

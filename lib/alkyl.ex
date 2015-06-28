@@ -31,6 +31,8 @@ defmodule Alkyl do
     )
 
     children = [
+      worker(Alkyl.PadPoolStore, [%{}]),
+      supervisor(Alkyl.PadPoolSub, []),
       worker(Alkyl.Reloader, []),
       worker(Alkyl.Repo, [])
     ]

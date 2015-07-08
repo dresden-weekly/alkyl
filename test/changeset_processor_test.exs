@@ -13,11 +13,11 @@ defmodule Alkyl.ChangesetProcessorTest do
     pad_atext = %{text: "This is an initial static text-piece.\n\n",
                   attribs: "|2+13"}
 
-    pad_pool = %{attribs: %{}, nextnum: 0}
+    pad_pool = %{numToAttrib: %{}, nextNum: 0}
 
     chset_str = "Z:13>0=b*0=7$"
 
-    chs_pool = %Pool{attribs: %{"0" => ["bold","true"]}, nextnum: 1}
+    chs_pool = %Pool{numToAttrib: %{"0" => ["bold","true"]}, nextNum: 1}
 
     { pad, chset } = prepare_data(pad_atext, pad_pool, chset_str, chs_pool)
 
@@ -27,8 +27,8 @@ defmodule Alkyl.ChangesetProcessorTest do
                               atext: %Atext{text: "This is an initial static text-piece.\n\n",
                                             attribs: "+b*0+7|2+l"},
                               pool: %Pool{
-                                        attribs: %{"0" => ["bold", "true"]},
-                                        nextnum: 1},
+                                        numToAttrib: %{"0" => ["bold", "true"]},
+                                        nextNum: 1},
                               head: 0
                             }
   end
@@ -38,11 +38,11 @@ defmodule Alkyl.ChangesetProcessorTest do
     pad_atext = %{text: "This is an initial static text-piece.\n\n",
                   attribs: "+b*0+7|2+l"}
 
-    pad_pool = %{attribs: %{"0" => ["bold","true"]}, nextnum: 1}
+    pad_pool = %{numToAttrib: %{"0" => ["bold","true"]}, nextNum: 1}
 
     chset_str = "Z:13>0=8*0=h$"
 
-    chs_pool = %Pool{attribs: %{"0" => ["italic","true"]}, nextnum: 1}
+    chs_pool = %Pool{numToAttrib: %{"0" => ["italic","true"]}, nextNum: 1}
 
     { pad, chset } = prepare_data(pad_atext, pad_pool, chset_str, chs_pool)
 
@@ -50,9 +50,9 @@ defmodule Alkyl.ChangesetProcessorTest do
 
     assert pad_res.atext.attribs == "+8*1+3*0*1+7*1+7|2+e"
 
-    assert pad_res.pool == %Pool{ attribs: %{"0" => ["bold", "true"],
+    assert pad_res.pool == %Pool{ numToAttrib: %{"0" => ["bold", "true"],
                                              "1" => ["italic","true"]},
-                                  nextnum: 2}
+                                  nextNum: 2}
   end
 
   test "deleting one character" do
@@ -60,12 +60,12 @@ defmodule Alkyl.ChangesetProcessorTest do
     pad_atext = %{text: "This is an initial static text-piece.\n\n",
                   attribs: "+8*1+3*0*1+7*1+7|2+e"}
 
-    pad_pool = %{attribs: %{"0" => ["bold", "true"],
-                            "1" => ["italic","true"]}, nextnum: 1}
+    pad_pool = %{numToAttrib: %{"0" => ["bold", "true"],
+                            "1" => ["italic","true"]}, nextNum: 1}
 
     chset_str = "Z:13<1=9-1$"
 
-    chs_pool = %Pool{attribs: %{"0" => ["italic","true"]}, nextnum: 1}
+    chs_pool = %Pool{numToAttrib: %{"0" => ["italic","true"]}, nextNum: 1}
 
     { pad, chset } = prepare_data(pad_atext, pad_pool, chset_str, chs_pool)
 
@@ -81,12 +81,12 @@ defmodule Alkyl.ChangesetProcessorTest do
     pad_atext = %{text: "This is a initial static text-piece.\n\n",
                   attribs: "+8*1+2*0*1+7*1+7|2+e"}
 
-    pad_pool = %{attribs: %{"0" => ["bold", "true"],
-                            "1" => ["italic","true"]}, nextnum: 1}
+    pad_pool = %{numToAttrib: %{"0" => ["bold", "true"],
+                            "1" => ["italic","true"]}, nextNum: 1}
 
     chset_str = "Z:12>5=a*0+5$tiny "
 
-    chs_pool = %Pool{attribs: %{"0" => ["italic","true"]}, nextnum: 1}
+    chs_pool = %Pool{numToAttrib: %{"0" => ["italic","true"]}, nextNum: 1}
 
     { pad, chset } = prepare_data(pad_atext, pad_pool, chset_str, chs_pool)
 

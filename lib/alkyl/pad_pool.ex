@@ -5,115 +5,114 @@ defmodule Alkyl.PadPool do
 
   # External API
   def start_link() do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  def register(pid, pad) do
-    GenServer.cast(__MODULE__, {:register, pid, pad})
+  def register(io_atom, pid) do
+    GenServer.cast(__MODULE__, {:register, io_atom, pid})
   end
 
-  def unregister(pid, pad) do
-    GenServer.cast(__MODULE__, {:unregister, pid, pad})
+  def unregister(io_atom) do
+    GenServer.cast(__MODULE__, {:unregister, io_atom})
   end
 
-  def broadcast(pid, pad, message) do
-    GenServer.cast(__MODULE__, {:broadcast, pid, pad, message})
+  def join(pad, io_atom) do
+    GenServer.cast(__MODULE__, {:join, pad, io_atom})
   end
 
-  def show(pad \\ "") do
-    GenServer.call(__MODULE__, {:show, pad})
+  def disjoin(pad, io_atom) do
+    GenServer.cast(__MODULE__, {:disjoin, pad, io_atom})
+  end
+
+  def broadcast(pad, io_atom, message) do
+    GenServer.cast(__MODULE__, {:broadcast, pad, io_atom, message})
+  end
+  def broadcast(pad, message) do
+    GenServer.cast(__MODULE__, {:broadcast, pad, nil, message})
+  end
+
+  def get(pad \\ "") do
+    reply = GenServer.call(__MODULE__, {:get, pad})
+    reply
+  end
+
+  def get_state() do
+    GenServer.call(__MODULE__, {:get_state})
+  end
+
+  def num_pad_users(pad) do
+    reply = GenServer.call(__MODULE__, {:get, pad})
+    length(reply)
   end
 
   # GenServer implementation
   def init(_) do
-    pool = Alkyl.PadPoolStore.get()
+    pool = Alkyl.PadPoolDepot.get()
     # Logger.debug "got pool #{inspect pool}"
     { :ok, pool }
   end
 
-  def handle_cast({:broadcast, pid, pad, message}, pool) do
-    List.delete(pool[pad], pid)
-    |> Enum.each fn p ->
-      send p, message
-    end
-    {:noreply, pool}
-  end
-
-  def handle_cast({:register, pid, pad}, pool) do
-    unless Dict.has_key? pool, pad do
-      pool = Dict.put_new pool, pad, [ pid ]
+  def handle_cast({:register, io_atom, pid}, { pool, io2pid }) do
+    if Dict.has_key? io2pid, io_atom do
+      io2pid = Dict.put io2pid, io_atom, pid
     else
-      pool = Dict.put(pool, pad, pool[pad] ++ [ pid ])
+      io2pid = Dict.put_new io2pid, io_atom, pid
     end
-    {:noreply, pool}
+    {:noreply, { pool, io2pid }}
   end
 
-  def handle_cast({:unregister, pid, pad}, pool) do
-    pool = Dict.put(pool, pad, List.delete(pool[pad], pid))
+  def handle_cast({:unregister, io_atom}, { pool, io2pid }) do
+    if Dict.has_key? io2pid, io_atom do
+      io2pid = Dict.delete io2pid, io_atom
+    end
+    {:noreply, { pool, io2pid }}
+  end
+
+  def handle_cast({:broadcast, pad, io_atom, message}, { pool, io2pid } ) do
+    case io_atom do
+      nil -> pool[pad]
+      _ -> List.delete(pool[pad], io_atom)
+    end
+    |> Enum.each fn p ->
+      send io2pid[p], message
+    end
+    {:noreply, { pool, io2pid }}
+  end
+
+  def handle_cast({:join, pad, io_atom}, { pool, io2pid }) do
+    unless Dict.has_key? pool, pad do
+      pool = Dict.put_new pool, pad, [ io_atom ]
+    else
+      pool = Dict.put(pool, pad, pool[pad] ++ [ io_atom ])
+    end
+    {:noreply, { pool, io2pid }}
+  end
+
+  def handle_cast({:disjoin, pad, io_atom}, { pool, io2pid }) do
+    pool = Dict.put(pool, pad, List.delete(pool[pad], io_atom))
     if length(pool[pad]) == 0 do
       pool = Dict.delete pool, pad
     end
-    {:noreply, pool}
+    if Dict.has_key? io2pid, io_atom do
+      io2pid = Dict.delete io2pid, io_atom
+    end
+    {:noreply, { pool, io2pid }}
   end
 
-  def handle_call({:show, pad}, {from, ref}, pool) do
-    case String.length(pad) do
-      0 -> {:reply, pool, pool}
-      _ -> {:reply, pool[pad], pool}
+  def handle_call({:get_state}, _, state) do
+     {:reply, state, state}
+  end
+
+  def handle_call({:get, pad}, _, { pool, io2pid }) do
+    reply = case String.length(pad) do
+      0 -> {:reply, pool, { pool, io2pid }}
+      _ -> {:reply, pool[pad], { pool, io2pid }}
     end
   end
 
   def terminate(_reason, pool) do
     # Logger.debug "shoulda savea #{inspect pool}"
-    Alkyl.PadPoolStore.save pool
+    Alkyl.PadPoolDepot.save pool
     :ok
   end
-
-  # use GenServer
-
-  # def start_link() do
-  #   Agent.start_link(fn -> HashDict.new end, name: __MODULE__)
-  # end
-
-  # def register(pid, pad) do
-  #   Agent.update(__MODULE__,
-  #     fn state ->
-  #       unless Dict.has_key? state, pad do
-  #         Dict.put_new state, pad, [ pid ]
-  #       else
-  #         Dict.put(state, pad, state[pad] ++ [ pid ])
-  #       end
-  #     end)
-  #   end
-
-  # def unregister(pid, pad) do
-  #   Agent.update(__MODULE__,
-  #     fn state ->
-  #      state =  Dict.put(state, pad, List.delete(state[pad], pid))
-  #       if length(state[pad]) == 0 do
-  #         state = Dict.delete state, pad
-  #       end
-  #       state
-  #     end)
-  # end
-
-  # def broadcast(pid, pad, message) do
-  #   Agent.get(__MODULE__,
-  #     fn state ->
-  #       List.delete(state[pad], pid)
-  #       |> Enum.each fn p ->
-  #         send p, message
-  #       end
-  #     end)
-  # end
-
-  # def show(pad \\ "") do
-  #   Agent.get(__MODULE__,
-  #     fn state ->
-  #       case String.length(pad) do
-  #         0 -> {:reply, state, state}
-  #         _ -> {:reply, state[pad], state}
-  #       end
-  #     end)
-  # end
 end

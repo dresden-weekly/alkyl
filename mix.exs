@@ -35,7 +35,9 @@ defmodule Alkyl.Mixfile do
         { :poison,        "~> 1.3"  },
         { :ecto,          "~> 0.11" },
         { :postgrex,      "~> 0.8"  },
-        { :fs,            "~> 0.9"  }
+        { :fs,            "~> 0.9"  },
+        { :calendar,      "~> 0.6"  },
+        { :base62,        "~> 1.1"  }
     ]
   end
 end

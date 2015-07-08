@@ -1,5 +1,7 @@
 defmodule Alkyl.DynamicPageHandler do
 
+  require Logger
+
   # We are using the plain HTTP handler.  See the documentation here:
   #     http://ninenines.eu/docs/en/cowboy/HEAD/manual/cowboy_http_handler/
   #
@@ -35,7 +37,7 @@ defmodule Alkyl.DynamicPageHandler do
       # TODO: set session cookie express_sid / to something like s%3APm7Q814C4DOiukwE-N-jyYFWYdeCSui4.h26Md53eQcj4g4Dw79HJIoKJg2hWHB%2BJHDociuogrJ8
 
       # body of reply.
-      build_body(request),
+      dispatch(request),
 
       # original request
       request
@@ -55,7 +57,26 @@ defmodule Alkyl.DynamicPageHandler do
     :ok
   end
 
-  def build_body(_request) do
+  def dispatch(request) do
+    # Logger.debug inspect
+    { path, _ } =  :cowboy_req.path(request)
+    build_body path, request
+  end
+
+  def build_body("/p/" <> pad_name, _request) do
     File.read! "priv/pad.html"
+  end
+
+  def build_body("/jserror", request) do
+    # { err_info, _ } =  :cowboy_req.qs_val("errorInfo", request, "")
+    # Logger.error "/jserror with #{inspect err_info}"
+    { :ok, params, _ } =  :cowboy_req.body_qs(request)
+    Logger.error "/jserror with #{:proplists.get_value "errorInfo", params}"
+    "OK"
+  end
+
+  def build_body(unknown, _request) do
+    Logger.error "unknown path: #{unknown}"
+    "ERROR"
   end
 end

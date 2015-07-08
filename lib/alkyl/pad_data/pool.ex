@@ -1,5 +1,5 @@
 defmodule Alkyl.PadData.Pool do
-  defstruct attribs: %{}, nextnum: 0
+  defstruct numToAttrib: %{}, nextNum: 0
   alias __MODULE__
 
   @doc """
@@ -17,19 +17,19 @@ defmodule Alkyl.PadData.Pool do
   """
   def unify(exs_pool, chs_pool) do
 
-    { chs_atts, rem_atts } = seperate_remove_ops(chs_pool.attribs)
+    { chs_atts, rem_atts } = seperate_remove_ops(chs_pool.numToAttrib)
 
-    exs_by_val = for { id, attr_list } <- exs_pool.attribs, into: %{}, do: { attr_list, id }
+    exs_by_val = for { id, attr_list } <- exs_pool.numToAttrib, into: %{}, do: { attr_list, id }
 
-    { chs_atts, { next_num, chs2exs } } = integrate_numbers(chs_atts, exs_by_val, exs_pool.nextnum)
+    { chs_atts, { next_num, chs2exs } } = integrate_numbers(chs_atts, exs_by_val, exs_pool.nextNum)
     { rem_atts, { next_rem_num, rem2exs } } = integrate_numbers(rem_atts, %{}, next_num)
 
     [ chs_atts, rem_atts ] = Enum.map [ chs_atts, rem_atts ], &(Enum.into(&1, %{}))
 
-    exs_n_pool = %Pool{attribs: Dict.merge(exs_pool.attribs, chs_atts), nextnum: next_num}
-    chs_n_pool = %Pool{attribs: Dict.merge(chs_atts, rem_atts), nextnum: next_rem_num}
+    exs_n_pool = %Pool{numToAttrib: Dict.merge(exs_pool.numToAttrib, chs_atts), nextNum: next_num}
+    chs_n_pool = %Pool{numToAttrib: Dict.merge(chs_atts, rem_atts), nextNum: next_rem_num}
 
-    rem_ops = find_remove_ops(chs_n_pool.attribs)
+    rem_ops = find_remove_ops(chs_n_pool.numToAttrib)
 
     { { exs_n_pool, chs_n_pool }, { Dict.merge(chs2exs, rem2exs), rem_ops } }
   end

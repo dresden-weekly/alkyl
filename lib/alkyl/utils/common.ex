@@ -3,8 +3,12 @@ defmodule Alkyl.Utils.Common do
   import Alkyl.Utils.Base36
 
   @doc """
-  turning an attribut identifier string into a list of
-  ("decimal") strings. e.g.: "*0*7*b" -> ["0","7","11"]
+  Turning an attribut identifier string into a list of
+  ("decimal") strings.
+
+  ## Example
+  iex> Alkyl.Utils.Common.attribs_prs "*0*7*b"
+  ["0","7","11"]
   """
   def attribs_prs("") do
     []
@@ -52,6 +56,40 @@ defmodule Alkyl.Utils.Common do
     false
   end
 
+  @doc"""
+  Split a string at a given position if it doesn't contain linefeeds,
+  else split it at the lat linefeed before the given position.
+
+  ## Example
+    iex> Alkyl.Utils.Common.split_lf_aware("one line string\\n", 3)
+    {"one", " line string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("one line string\\n", 9)
+    {"one line ", "string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("two line\\n string\\n", 9)
+    {"two line\\n", " string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("one line ütf-8 string\\n", 3)
+    {"one", " line ütf-8 string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("one line ütf-8 string\\n", 9)
+    {"one line ", "ütf-8 string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("one line ütf-8 string\\n", 14)
+    {"one line ütf-8", " string\\n"}
+    iex> Alkyl.Utils.Common.split_lf_aware("two line\\n ütf-8 string\\n", 9)
+    {"two line\\n", " ütf-8 string\\n"}
+
+    iex> Alkyl.Utils.Common.split_lf_aware("", 0)
+    {"", ""}
+    iex> Alkyl.Utils.Common.split_lf_aware("", 5)
+    {"", ""}
+    iex> Alkyl.Utils.Common.split_lf_aware("one", 5)
+    {"one", ""}
+    iex> Alkyl.Utils.Common.split_lf_aware("one\\n line", 10)
+    {"one\\n", " line"}
+    iex> Alkyl.Utils.Common.split_lf_aware("two\\nlines\\n", 12)
+    {"two\\nlines\\n", ""}
+    # iex>_raise ArgumentError, "position out of range", fn ->
+    #   split_lf_aware("", 5)
+    # end
+  """
   def split_lf_aware(str, pos) do
     split_lf_aware(str, pos, "", "")
   end

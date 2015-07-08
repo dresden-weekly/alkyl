@@ -30,10 +30,10 @@ defmodule Alkyl.PadData.Changeset do
   end
 
   def find_exclusive(pool, att_ids) do
-    id2att = for id <- att_ids, into: %{}, do: { id, Enum.at(pool.attribs[id], 0)}
+    id2att = for id <- att_ids, into: %{}, do: { id, Enum.at(pool.numToAttrib[id], 0)}
     Enum.map( id2att, fn {id, att_name} ->
       { id,
-      (Enum.filter( pool.attribs, fn { _, [ patt_name, _ ] } -> att_name == patt_name end )
+      (Enum.filter( pool.numToAttrib, fn { _, [ patt_name, _ ] } -> att_name == patt_name end )
       |> Enum.map fn {pid, _} -> pid end) }
     end )
     |> Enum.into %{}

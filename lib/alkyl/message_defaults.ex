@@ -1,4 +1,19 @@
 defmodule Alkyl.MessageDefaults do
+
+  alias Alkyl.PadData.Pad
+  alias Alkyl.PadData.Atext
+  alias Alkyl.PadData.Pool
+  def initial_pad do
+    %Pad{atext: %Atext{attribs: "|2+13",
+                       text: "This is an initial static text-piece.\n\n"},
+         pool: %Pool{nextNum: 0, numToAttrib: %{}}
+        }
+  end
+
+  def author do
+    %{colorId: 9, name: nil, timestamp: 0}
+  end
+
   def client_vars do
     %{
             "abiwordAvailable" => "no",
@@ -16,16 +31,15 @@ defmodule Alkyl.MessageDefaults do
             "readOnlyId" => "r.c8f45fed8f9805e43b8a528caa524823",
             "readonly" => false,
             "savedRevisions" => [],
-            "serverTimestamp" => 1434022572479,
+            "serverTimestamp" => 0,
             "userColor" => 12,
             "userId" => "a.1SiSgAsAkLdfjIn2",
             "userIsGuest" => true,
             "collab_client_vars" => %{"apool" => %{"nextNum" => 0, "numToAttrib" => %{}},
                                       "clientIp" => "127.0.0.1",
                                       "historicalAuthorData" => %{},
-                                      "initialAttributedText" => %{
-                                                                         "attribs" => "|2+13",
-                                                                         "text" => "This is an initial static text-piece.\n\n"},
+                                      "initialAttributedText" => %{ "attribs" => "|2+13",
+                                                                    "text" => "This is an initial static text-piece.\n\n"},
                                       "padId" => "icke",
                                       "rev" => 0,
                                       "time" => 1434008984626},

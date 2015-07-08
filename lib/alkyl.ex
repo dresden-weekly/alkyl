@@ -12,6 +12,8 @@ defmodule Alkyl do
 
           {"/p/[...]", Alkyl.DynamicPageHandler, []},
 
+          {"/jserror", Alkyl.DynamicPageHandler, []},
+
           {"/socket.io/",             Alkyl.WebsocketHandler, []},
 
           {"/socket.io/socket.io.js",  :cowboy_static, {:priv_file,  :alkyl, "socket.io.js"}},
@@ -31,8 +33,8 @@ defmodule Alkyl do
     )
 
     children = [
-      worker(Alkyl.PadPoolStore, [%{}]),
-      supervisor(Alkyl.PadPoolSub, []),
+      worker(Alkyl.PadPoolDepot, [ { %{}, %{} } ]),
+      worker(Alkyl.PadPool, []),
       worker(Alkyl.Reloader, []),
       worker(Alkyl.Repo, [])
     ]

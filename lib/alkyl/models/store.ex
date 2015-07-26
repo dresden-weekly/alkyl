@@ -57,12 +57,16 @@ defmodule Alkyl.Store do
   def author_by_token(tok) do
     key = "token2author:#{tok}"
     rec = get(Store, key)
-    unless rec do
+    if rec do
+      author_rec = get(Store, "globalAuthor:#{rec.value}")
+      author = Poison.decode! author_rec.value, keys: :atoms
+    else
+      author = Alkyl.MessageDefaults.author
       rec = insert(%Store{key: key, value: Alkyl.Utils.Session.author_id})
-      insert(%{key: "globalAuthor:#{rec.value}",
-               value: Poison.encode!(%{Alkyl.MessageDefaults.author | timestamp: Alkyl.Utils.Messages.js_now()}) })
+      author_rec = insert(%Store{key: "globalAuthor:#{rec.value}", value: Poison.encode!(author) })
     end
-    rec.value
+    update(%Store{author_rec | value: Poison.encode!(%{author | timestamp: Alkyl.Utils.Messages.js_now()}) })
+    %{user: rec.value, user_name: author.name}
   end
 
   def insert_chat(pad, message) do
@@ -82,15 +86,7 @@ defmodule Alkyl.Store do
     match = "pad:#{pad}:chat:[0-9]+"
     q = from s in Alkyl.Store,
           where: fragment("? similar to ?", s.key, ^match),
-          order_by: fragment("regexp_replace(?, '^.+:', '', '')::int", s.key)
+          order_by: fragment("regexp_replace(?, '^.+:', '')::int", s.key)
     Alkyl.Repo.all(q) |> Enum.map &(Poison.decode! &1.value)
   end
-
-  # def get_chats_str(pad) do
-  #   match = "pad:#{pad}:chat:[0-9]+"
-  #   q = from s in Alkyl.Store,
-  #         where: fragment("? similar to ?", s.key, ^match),
-  #         order_by: fragment("regexp_replace(?, '^.+:', '', '')::int", s.key)
-  #   "[" <> (Alkyl.Repo.all(q) |> Enum.map(&(&1.value)) |> Enum.join(",")) <> "]"
-  # end
 end

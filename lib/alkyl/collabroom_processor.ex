@@ -33,7 +33,7 @@ defmodule Alkyl.CollabroomProcessor do
       message = Dict.put_new message, "userName", state.user_name
     end
 
-    Alkyl.PadPool.broadcast state.pad, format_message("COLLABROOM", message)
+    Alkyl.ClientPool.broadcast state.pad, format_message("COLLABROOM", message)
 
     Alkyl.Store.insert_chat(state.pad, message)
     { nil, req, state }

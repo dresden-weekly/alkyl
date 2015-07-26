@@ -11,7 +11,7 @@ defmodule Alkyl.MessageDefaults do
   end
 
   def author do
-    %{colorId: 9, name: nil, timestamp: 0}
+    %{colorId: :crypto.rand_uniform(0,34), name: nil, timestamp: 0}
   end
 
   def client_vars do

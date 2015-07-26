@@ -33,10 +33,11 @@ defmodule Alkyl do
     )
 
     children = [
-      worker(Alkyl.PadPoolDepot, [ { %{}, %{} } ]),
-      worker(Alkyl.PadPool, []),
+      worker(Alkyl.ClientPoolDepot, [ %{pads: %{}, sid2sess: %{}, sid2pid: %{}} ]),
+      worker(Alkyl.ClientPool, []),
       worker(Alkyl.Reloader, []),
-      worker(Alkyl.Repo, [])
+      worker(Alkyl.Repo, []),
+      supervisor(Alkyl.PollingAgentsSupervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: Alkyl.Supervisor]

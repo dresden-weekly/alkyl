@@ -1,4 +1,4 @@
-defmodule Alkyl.PadPoolDepot do
+defmodule Alkyl.ClientPoolDepot do
 
   use GenServer
 

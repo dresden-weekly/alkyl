@@ -3,16 +3,12 @@ defmodule Alkyl.MessageProcessor do
   import Alkyl.Utils.Messages
 
   def process( %{ "type" => "CLIENT_READY"} = cdata, req, state ) do
-    Logger.debug "processing CLIENT_READY message... #{inspect cdata}"
-    { io_cookie, _ } = :cowboy_req.cookie("io", req, nil)
-    state = %{state | pad: cdata["padId"],
-              user: Alkyl.Store.author_by_token(cdata["token"]),
-              io_atom: Alkyl.Utils.Session.io_atom(io_cookie)}
-    Alkyl.PadPool.join state.pad, state.io_atom
-    Logger.debug "state.io_atom: #{state.io_atom}"
-    # todo: identify guest users by "token" cookie resp. by cdata.token
-    # and  globalAuthor/token2author records, and before all
-    # initialize the pad...
+    Logger.debug "processing CLIENT_READY message...  #{inspect state} #{inspect cdata}"
+    # { io_cookie, _ } = :cowboy_req.cookie("io", req, nil)
+
+    state = Map.merge %{state | pad: cdata["padId"]},
+                      Alkyl.Store.author_by_token(cdata["token"])
+    Alkyl.ClientPool.join state.sid, state
     pad = Alkyl.Store.get_pad state.pad
     { { client_ip, _ }, _ } = :cowboy_req.peer(req)
     data = %{ Alkyl.MessageDefaults.client_vars |
@@ -27,7 +23,7 @@ defmodule Alkyl.MessageProcessor do
                                 "padId" => state.pad,
                                 "rev" => 0,
                                 "time" => 1434008984626}, # need to get this from the last rev
-      "numConnectedUsers" => Alkyl.PadPool.num_pad_users(state.pad) - 1
+      "numConnectedUsers" => Alkyl.ClientPool.num_pad_users(state.pad) - 1
     }
     { format_message("CLIENT_VARS", data ), req, state }
   end

@@ -66,7 +66,13 @@ defmodule Alkyl.Store do
       author_rec = insert(%Store{key: "globalAuthor:#{rec.value}", value: Poison.encode!(author) })
     end
     update(%Store{author_rec | value: Poison.encode!(%{author | timestamp: Alkyl.Utils.Messages.js_now()}) })
-    %{user: rec.value, user_name: author.name}
+    %{user: rec.value, user_name: author.name, user_colorId: author.colorId}
+  end
+
+  def update_user(user, data) do
+    author_rec = get(Store, "globalAuthor:#{user}")
+    author = Poison.decode! author_rec.value, keys: :atoms
+    update(%Store{author_rec | value: Poison.encode!(%{Map.merge(author, data) | timestamp: Alkyl.Utils.Messages.js_now()}) })
   end
 
   def insert_chat(pad, message) do

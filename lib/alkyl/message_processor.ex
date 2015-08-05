@@ -15,6 +15,8 @@ defmodule Alkyl.MessageProcessor do
       "padId" => state.pad,
       "userId" => state.user,
       "serverTimestamp" => js_now(),
+      "userColor" => state.user_colorId,
+      "userName" => state.user_name,
       "chatHead" => pad.chatHead,
       "collab_client_vars" => %{"apool" => pad.pool,
                                 "clientIp" => :inet.ntoa(client_ip),

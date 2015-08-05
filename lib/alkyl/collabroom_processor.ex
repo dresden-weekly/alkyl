@@ -17,12 +17,18 @@ defmodule Alkyl.CollabroomProcessor do
     { format_message("COLLABROOM", message), req, state }
   end
 
-  def process( %{"type" => "USERINFO_UPDATE"} = cdata, req, state ) do
+  def process( %{"type" => "USERINFO_UPDATE", "userInfo" => userInfo} = cdata, req, state ) do
     # {"type":"USERINFO_UPDATE","userInfo":{"userId":"a.PnwbmyVSInSBAV8G","name":"chromium","ip":"127.0.0.1","colorId":"#c7ff8f","userAgent":"Anonymous"}}}]
     # save user and
     # forward {"type":"USER_NEWINFO","userInfo":{"userId":"a.PnwbmyVSInSBAV8G","name":"chromium","colorId":"#c7ff8f","userAgent":"Anonymous","ip":"127.0.0.1"}}}]
     # to the rest
-    { nil, req, state }
+
+    Alkyl.Store.update_user(state.user, %{name: userInfo["name"], colorId: userInfo["colorId"] })
+
+    message = %{cdata | "type" => "USER_NEWINFO"}
+    Alkyl.ClientPool.broadcast state.pad, format_message("COLLABROOM", message), state.sid
+
+    { nil, req, %{ state | user_name: userInfo["name"] } }
   end
 
   def process( %{"type" => "CHAT_MESSAGE"} = message, req, state ) do

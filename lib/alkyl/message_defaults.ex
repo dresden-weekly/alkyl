@@ -34,6 +34,7 @@ defmodule Alkyl.MessageDefaults do
             "serverTimestamp" => 0,
             "userColor" => 12,
             "userId" => "a.1SiSgAsAkLdfjIn2",
+            "userName" => "",
             "userIsGuest" => true,
             "collab_client_vars" => %{"apool" => %{"nextNum" => 0, "numToAttrib" => %{}},
                                       "clientIp" => "127.0.0.1",
